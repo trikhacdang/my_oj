@@ -302,7 +302,7 @@
                     <th style="width: 50px; text-align: center;">✔</th>
                     <th style="width: 80px;">ID</th>
                     <th>Tên bài</th>
-                    <th style="width: 180px;">File Input / Output</th>
+                    <th style="width: 220px;">File Input / Output</th>
                     <th style="width: 80px;">Điểm</th>
                 </tr>
             </thead>
@@ -369,7 +369,6 @@
     const problems = JSON.parse(document.getElementById('problems-data').textContent);
     let currentPid = "1";
 
-    // Khởi tạo và khôi phục trạng thái từ LocalStorage
     function initStatus() {
         for (let pid in problems) {
             const savedStatus = localStorage.getItem("oj_status_" + pid);
@@ -387,14 +386,12 @@
     function selectProblem(pid) {
         currentPid = pid;
         
-        // Highlight hàng được chọn
         for (let id in problems) {
             const row = document.getElementById("row-" + id);
             if (row) row.classList.remove("active-row");
         }
         document.getElementById("row-" + pid).classList.add("active-row");
 
-        // Cập nhật nội dung bài tập
         const p = problems[pid];
         document.getElementById("p_title").innerText = p.title;
         document.getElementById("p_inp").innerText = p.input_file;
@@ -406,7 +403,6 @@
         document.getElementById("detail_container").style.display = "none";
     }
 
-    // Chọn bài 1 mặc định khi mở trang
     selectProblem("1");
     initStatus();
 
@@ -437,13 +433,11 @@
             detailEl.innerText = data.detail;
             detailContainer.style.display = "block";
 
-            // Cập nhật biểu tượng trạng thái ✔ hoặc ❌
             const iconEl = document.getElementById("status-icon-" + currentPid);
             if (data.status === "AC") {
                 iconEl.innerHTML = '<span class="status-ac">✔</span>';
                 localStorage.setItem("oj_status_" + currentPid, "AC");
             } else {
-                // Nếu chưa từng AC thì đánh dấu ❌
                 if (localStorage.getItem("oj_status_" + currentPid) !== "AC") {
                     iconEl.innerHTML = '<span class="status-wa">❌</span>';
                     localStorage.setItem("oj_status_" + currentPid, "WA");
