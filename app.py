@@ -315,10 +315,7 @@ def generate_tests_gopmang(count=100):
         a = [random.randint(1, 1000000000) for _ in range(n)]
         b = [random.randint(1, 1000000000) for _ in range(m)]
 
-        # Cách 1
         c1 = b + a
-        
-        # Cách 2
         c2 = []
         min_len = min(n, m)
         for idx in range(min_len):
@@ -352,7 +349,7 @@ PROBLEMS = {
             <p><b>Kết quả:</b> ghi ra file văn bản <code>QUYHOACH.OUT</code> ghi một dòng duy nhất là độ cao của toàn nhà cao nhất là tòa nhà thấp nhất (hai số cách nhau một khoảng trắng).</p>
             <table class="example-table">
                 <tr><th>QUYHOACH.INP</th><th>QUYHOACH.OUT</th></tr>
-                <tr><td>7<br>4 7 2 9<br>8 2 6</td><td>9 2</td></tr>
+                <tr><td>7<br>4 7 2 9 8 2 6</td><td>9 2</td></tr>
             </table>
             <p><b>Giải thích:</b> Tòa nhà cao nhất có độ cao là 9, tòa nhà thấp nhất có độ cao là 2.</p>
             <p><b>Ràng buộc:</b></p>
@@ -379,7 +376,7 @@ PROBLEMS = {
             <p><b>Kết quả:</b> ghi ra file văn bản <code>NGUYENTO.OUT</code> ghi một dòng duy nhất là số lượng tòa nhà có độ cao là số nguyên tố.</p>
             <table class="example-table">
                 <tr><th>NGUYENTO.INP</th><th>NGUYENTO.OUT</th></tr>
-                <tr><td>11<br>4 7 2 9<br>8 2 6 11 18 20 29</td><td>5</td></tr>
+                <tr><td>11<br>4 7 2 9 8 2 6 11 18 20 29</td><td>5</td></tr>
             </table>
             <p><b>Giải thích:</b> Có 5 toà nhà có độ cao là số nguyên tố.</p>
             <p><b>Ràng buộc:</b></p>
@@ -409,7 +406,7 @@ PROBLEMS = {
             </ul>
             <table class="example-table">
                 <tr><th>VITRI.INP</th><th>VITRI.OUT</th></tr>
-                <tr><td>11 2<br>4 7 2 9<br>8 2 6 11 2 2 4</td><td>4<br>2 5 8 9</td></tr>
+                <tr><td>11 2<br>4 7 2 9 8 2 6 11 2 2 4</td><td>4<br>2 5 8 9</td></tr>
             </table>
             <p><b>Giải thích:</b> Có 4 toà nhà có độ cao là 2, ở vị trí 2, 5, 8, 9.</p>
             <p><b>Ràng buộc:</b></p>
@@ -626,7 +623,7 @@ PROBLEMS = {
             </ul>
             <table class="example-table">
                 <tr><th>DACBIET.INP</th><th>DACBIET.OUT</th></tr>
-                <tr><td>7<br>2 3 7 6<br>8 8 6</td><td>3<br>2</td></tr>
+                <tr><td>7<br>2 3 7 6 8 8 6</td><td>3<br>2</td></tr>
             </table>
             <p><b>Giải thích:</b> Có 3 tòa nhà đặc biệt với chiều cao là 2, 3, 7 và tòa nhà đặc biệt có chiều cao nhỏ nhất là 2.</p>
             <p><b>Ràng buộc:</b></p>
