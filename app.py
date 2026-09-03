@@ -7,7 +7,6 @@ from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
-# Giới hạn thời gian chạy cho mỗi ngôn ngữ (giây)
 TIME_LIMITS = {
     "cpp": 1.0,
     "python": 3.0
@@ -24,15 +23,11 @@ def is_prime(n):
 # ==================== 1. TEST GENERATORS ====================
 def generate_tests_quyhoach(count=100):
     tests = []
-    # Test mẫu trong đề bài
     tests.append({"input": "7\n4 7 2 9 8 2 6\n", "output": "9 2"})
-    
-    # Test biên bổ sung
     tests.append({"input": "1\n500\n", "output": "500 500"})
     tests.append({"input": "5\n7 7 7 7 7\n", "output": "7 7"})
     tests.append({"input": "4\n1 1000000000 500 1\n", "output": "1000000000 1"})
 
-    # Test ngẫu nhiên phân bổ theo Ràng buộc (40% N<=10^2, 30% N<=10^4, 30% N<=10^5)
     remaining = count - len(tests)
     for i in range(remaining):
         if i < 40:
@@ -51,14 +46,10 @@ def generate_tests_quyhoach(count=100):
 
 def generate_tests_nguyento(count=100):
     tests = []
-    # Test mẫu trong đề bài
     tests.append({"input": "11\n4 7 2 9 8 2 6 11 18 20 29\n", "output": "5"})
-    
-    # Test biên bổ sung
     tests.append({"input": "5\n1 4 6 8 10\n", "output": "0"})
     tests.append({"input": "4\n2 3 5 7\n", "output": "4"})
 
-    # Test ngẫu nhiên phân bổ theo Ràng buộc (50% N<=10^2, 50% N<=10000)
     remaining = count - len(tests)
     for i in range(remaining):
         if i < 50:
@@ -77,14 +68,10 @@ def generate_tests_nguyento(count=100):
 
 def generate_tests_vitri(count=100):
     tests = []
-    # Test mẫu trong đề bài
     tests.append({"input": "11 2\n4 7 2 9 8 2 6 11 2 2 4\n", "output": "4\n2 5 8 9"})
-    
-    # Test biên bổ sung
     tests.append({"input": "5 10\n1 2 3 4 5\n", "output": "NO"})
     tests.append({"input": "4 5\n5 1 2 3\n", "output": "1\n0"})
 
-    # Test ngẫu nhiên (50% N<=10^2, 50% N<=10^5)
     remaining = count - len(tests)
     for i in range(remaining):
         if i < 50:
@@ -114,14 +101,10 @@ def generate_tests_vitri(count=100):
 
 def generate_tests_somax(count=100):
     tests = []
-    # Test mẫu trong đề bài
     tests.append({"input": "24101980\n", "output": "98421100"})
-    
-    # Test biên bổ sung
     tests.append({"input": "7\n", "output": "7"})
     tests.append({"input": "1000000000000000000\n", "output": "1000000000000000000"})
 
-    # Test ngẫu nhiên phân bổ theo Ràng buộc (30% n<=10^3, 40% n<=10^9, 30% n<=10^18)
     remaining = count - len(tests)
     for i in range(remaining):
         if i < 30:
@@ -137,6 +120,165 @@ def generate_tests_somax(count=100):
         out_str = sorted_digits
         tests.append({"input": inp_str, "output": out_str})
         
+    return tests
+
+# Test Generators cho 6 bài mới
+def generate_tests_xlds(count=100):
+    sample_inp = "10\nLe Lo\nLam\nTran\nTrui Trui\nNguyen\nVan TeO\nKaka\nCR 9\nTruong\nTHCS Hong Bang Q5 Tp HCM\nA\nTran Thi\nBe cHi\nHoang Le\nThong nhat chi\nTran Lam\n"
+    sample_out = "2 ho ten co 1 tu\n2 ho ten co 2 tu\n3 ho ten co 3 tu\n1 ho ten co 4 tu\n1 ho ten co 5 tu\n1 ho ten co 7 tu\nTrui\nCR 9\nA\nHOANG LE THONG NHAT CHI\nTRAN THI BE CHI\nTRUONG THCS HONG BANG Q5 TP HCM\nKAKA\nLE LO LAM\nTRAN LAM\nNGUYEN VAN TEO\nTRAN TRUI TRUI"
+    tests = [{"input": sample_inp, "output": sample_out}]
+    
+    first_names = ["An", "Binh", "Chi", "Dung", "Em", "Giang", "Hoa", "Khoa", "Lam", "Minh", "Nam", "Oanh", "Phuc", "Quan", "Son", "Tu", "Uyen", "Vinh", "Xuan", "Yen", "Trui", "Kaka", "CR 9"]
+    middle_names = ["Van", "Thi", "Le", "Hoang", "THCS", "Hong Bang", "Q5", "Tp HCM", "Thong nhat", "Be"]
+    
+    remaining = count - len(tests)
+    for i in range(remaining):
+        n = random.randint(1, 100) if i < 50 else random.randint(101, 1000)
+        raw_names = []
+        word_counts = {}
+        parsed_list = []
+        
+        for _ in range(n):
+            num_words = random.randint(1, 7)
+            words = [random.choice(first_names + middle_names) for _ in range(num_words)]
+            raw_str = " ".join(words)
+            raw_names.append(raw_str)
+            
+            word_counts[num_words] = word_counts.get(num_words, 0) + 1
+            
+            w_split = raw_str.strip().split()
+            ten = w_split[-1]
+            ho = " ".join(w_split[:-1]) if len(w_split) > 1 else ten
+            parsed_list.append((ten, ho, raw_str.upper()))
+            
+        longest_ten = ""
+        for ten, ho, upper_full in parsed_list:
+            if len(ten) > len(longest_ten):
+                longest_ten = ten
+                
+        parsed_list.sort(key=lambda x: (x[0], x[1]))
+        
+        res_lines = []
+        for k in sorted(word_counts.keys()):
+            res_lines.append(f"{word_counts[k]} ho ten co {k} tu")
+        res_lines.append(longest_ten)
+        for item in parsed_list:
+            res_lines.append(item[2])
+            
+        inp_str = f"{n}\n" + "\n".join(raw_names) + "\n"
+        out_str = "\n".join(res_lines)
+        tests.append({"input": inp_str, "output": out_str})
+    return tests
+
+def generate_tests_giaima(count=100):
+    tests = [{"input": "S1F2Y2M1E3J4G2A4K3\n", "output": "THANHNIEN"}]
+    remaining = count - len(tests)
+    for i in range(remaining):
+        length = random.randint(1, 50) if i < 50 else random.randint(100, 500)
+        inp_chars = []
+        out_chars = []
+        for _ in range(length):
+            c = chr(random.randint(65, 90))
+            d = random.randint(0, 9)
+            inp_chars.append(f"{c}{d}")
+            out_chars.append(chr((ord(c) - 65 + d) % 26 + 65))
+        tests.append({"input": "".join(inp_chars) + "\n", "output": "".join(out_chars)})
+    return tests
+
+def generate_tests_demdoancon(count=100):
+    tests = [{"input": "TATIAN\n", "output": "3"}]
+    remaining = count - len(tests)
+    for i in range(remaining):
+        length = random.randint(5, 50) if i < 50 else random.randint(100, 1000)
+        letters = [chr(random.randint(65, 90)) for _ in range(length)]
+        s = "".join(letters)
+        
+        n = len(s)
+        ans = 0
+        for start in range(n):
+            for end in range(start + 1, n + 1):
+                sub = s[start:end]
+                i_t = sub.find('T')
+                if i_t != -1:
+                    i_i = sub.find('I', i_t + 1)
+                    if i_i != -1:
+                        i_n = sub.find('N', i_i + 1)
+                        if i_n != -1:
+                            ans += 1
+        tests.append({"input": s + "\n", "output": str(ans)})
+    return tests
+
+def generate_tests_timso(count=100):
+    tests = [
+        {"input": "245\n", "output": "236"},
+        {"input": "9\n", "output": "0"}
+    ]
+    remaining = count - len(tests)
+    for i in range(remaining):
+        n = random.randint(1, 10000) if i < 40 else random.randint(10001, 10**12)
+        s_n = str(n)
+        sum_n = sum(int(c) for c in s_n)
+        len_n = len(s_n)
+        
+        found = 0
+        for cand in range(n - 1, -1, -1):
+            s_c = str(cand)
+            if len(s_c) == len_n and sum(int(c) for c in s_c) == sum_n:
+                found = cand
+                break
+        tests.append({"input": f"{n}\n", "output": str(found)})
+    return tests
+
+def generate_tests_phanthuong(count=100):
+    tests = [{"input": "5\n1 3 4 3 5\n3\n5 2 4\n", "output": "5 3 4"}]
+    remaining = count - len(tests)
+    for i in range(remaining):
+        n = random.randint(1, 50) if i < 50 else random.randint(51, 1000)
+        m = random.randint(1, 50) if i < 50 else random.randint(51, 1000)
+        a = [random.randint(1, 100000) for _ in range(n)]
+        k_list = [random.randint(1, n) for _ in range(m)]
+        
+        pref_max = [0] * n
+        curr = 0
+        for idx, val in enumerate(a):
+            curr = max(curr, val)
+            pref_max[idx] = curr
+            
+        res = [str(pref_max[k - 1]) for k in k_list]
+        inp_str = f"{n}\n" + " ".join(map(str, a)) + f"\n{m}\n" + " ".join(map(str, k_list)) + "\n"
+        out_str = " ".join(res)
+        tests.append({"input": inp_str, "output": out_str})
+    return tests
+
+def generate_tests_lego(count=100):
+    sample_inp = "4 4\n1 2 0 1\n0 0 3 0\n1 1 0 1\n2 0 2 3\n"
+    tests = [{"input": sample_inp, "output": "66"}]
+    remaining = count - len(tests)
+    for i in range(remaining):
+        m = random.randint(1, 10) if i < 50 else random.randint(11, 50)
+        n = random.randint(1, 10) if i < 50 else random.randint(11, 50)
+        grid = [[random.randint(0, 10) for _ in range(n)] for _ in range(m)]
+        
+        ans = 0
+        for r in range(m):
+            for c in range(n):
+                h = grid[r][c]
+                if h > 0:
+                    ans += 1
+                    top = grid[r-1][c] if r > 0 else 0
+                    ans += max(0, h - top)
+                    bottom = grid[r+1][c] if r < m - 1 else 0
+                    ans += max(0, h - bottom)
+                    left = grid[r][c-1] if c > 0 else 0
+                    ans += max(0, h - left)
+                    right = grid[r][c+1] if c < n - 1 else 0
+                    ans += max(0, h - right)
+                    
+        inp_lines = [f"{m} {n}"]
+        for row in grid:
+            inp_lines.append(" ".join(map(str, row)))
+        inp_str = "\n".join(inp_lines) + "\n"
+        tests.append({"input": inp_str, "output": str(ans)})
     return tests
 
 # ==================== 2. KHAI BÁO DANH SÁCH BÀI TẬP ====================
@@ -246,6 +388,185 @@ PROBLEMS = {
                 <li>30% số điểm còn lại không có ràng buộc nào thêm.</li>
             </ul>
         """
+    },
+    "5": {
+        "title": "Bài 5: Xử lý danh sách",
+        "input_file": "XLDS.INP",
+        "output_file": "XLDS.OUT",
+        "gen": generate_tests_xlds,
+        "content_html": """
+            <p>Cho một danh sách họ tên của N người, tên là từ cuối cùng ở bên phải trong chuỗi họ tên, các từ còn lại là họ. Trường hợp họ tên có 1 từ thì từ đó vừa là tên và vừa là họ. Các từ cách nhau một khoảng trắng và không có khoảng trắng ở đầu.</p>
+            <p><b>Yêu cầu:</b></p>
+            <ul>
+                <li>Đếm xem có bao nhiêu họ tên có 1, 2, 3, … i từ?</li>
+                <li>Tìm tên dài nhất, nếu có nhiều tên dài như nhau thì lấy tên dài nhất đầu tiên trong danh sách. Đổi tất cả họ tên trong danh sách thành chữ in hoa.</li>
+                <li>Sắp xếp lại danh sách ban đầu tăng dần theo bảng mã ASCII với ưu tiên 1 là tên và ưu tiên 2 là họ.</li>
+            </ul>
+            <p><b>Dữ liệu:</b> vào từ file văn bản <code>XLDS.INP</code> gồm</p>
+            <ul>
+                <li>Dòng đầu chứa số nguyên dương N (0 < N &le; 10000)</li>
+                <li>N dòng tiếp theo, mỗi dòng ghi một họ tên của một người.</li>
+            </ul>
+            <p><b>Kết quả:</b> ghi ra file văn bản <code>XLDS.OUT</code> ghi như định dạng của ví dụ</p>
+            <ul>
+                <li>Liệt kê có bao nhiêu họ tên có 1, 2, 3, …, i từ</li>
+                <li>Dòng tiếp theo ghi ra tên dài nhất trong danh sách.</li>
+                <li>N dòng tiếp theo ghi ra danh sách họ tên đã được đổi sang chữ in hoa và đã được sắp xếp tăng dần theo thứ tự ưu tiên 1 là tên và ưu tiên 2 là họ</li>
+            </ul>
+            <table class="example-table">
+                <tr><th>XLDS.INP</th><th>XLDS.OUT</th></tr>
+                <tr>
+                    <td>10<br>Le Lo Lam<br>Tran Trui Trui<br>Nguyen Van TeO<br>Kaka<br>CR 9<br>Truong THCS Hong Bang Q5 Tp HCM<br>A<br>Tran Thi Be cHi<br>Hoang Le Thong nhat chi<br>Tran Lam</td>
+                    <td>2 ho ten co 1 tu<br>2 ho ten co 2 tu<br>3 ho ten co 3 tu<br>1 ho ten co 4 tu<br>1 ho ten co 5 tu<br>1 ho ten co 7 tu<br>Trui<br>CR 9<br>A<br>HOANG LE THONG NHAT CHI<br>TRAN THI BE CHI<br>TRUONG THCS HONG BANG Q5 TP HCM<br>KAKA<br>LE LO LAM<br>TRAN LAM<br>NGUYEN VAN TEO<br>TRAN TRUI TRUI</td>
+                </tr>
+            </table>
+            <p><b>Giải thích:</b></p>
+            <ul>
+                <li>2 họ tên có 1 từ là A và Kaka, 2 họ tên có 2 từ là CR 9 và Tran Lam, …</li>
+                <li>Có 2 tên trong danh sách cùng có 4 kí tự là Trui và Kaka. Tuy nhiên ta lấy tên dài nhất gặp đầu tiên là Trui</li>
+                <li>Vì sắp xếp tăng dần với ưu tiên 1 là tên nên CR 9 sẽ được xếp trước A do 9 xếp trước A trong bảng mã ASCII. Trường hợp LE LO LAM và TRAN LAM có tên giống nhau nên lúc này ta sẽ sắp xếp dựa trên ưu tiên 2 là họ. LE LO sẽ xếp trước TRAN do L đứng trước T trong bảng mã ASCII.</li>
+            </ul>
+            <p><b>Ràng buộc:</b></p>
+            <ul>
+                <li>50% số điểm của bài tương ứng với các test có N &le; 100</li>
+                <li>50% số điểm còn lại không có ràng buộc nào thêm.</li>
+            </ul>
+        """
+    },
+    "6": {
+        "title": "Bài 6: Giải mã",
+        "input_file": "GIAIMA.INP",
+        "output_file": "GIAIMA.OUT",
+        "gen": generate_tests_giaima,
+        "content_html": """
+            <p>Trong hoạt động Hội trại kỷ niệm tháng Thanh niên, Đoàn trường tổ chức trò chơi lớn đó là "Giải mã mật thư". Bạn Minh nhận được một mật thư từ ban tổ chức với nội dung là một xâu kí tự đã được mã hóa theo quy luật. Xâu kí tự này gồm các cặp chữ cái tiếng Anh viết hoa và chữ số từ 0 đến 9 liên tiếp nhau, mật thư được giải mã theo quy luật dịch chuyển vòng tròn chữ cái.</p>
+            <p><b>Ví dụ:</b> Xâu kí tự trong mật thư là 'R2F3M1' được giải mã theo quy luật: Kí tự 'R' dịch chuyển thêm 2 vị trí được kí tự 'T', kí tự 'F' dịch chuyển thêm 3 vị trí được kí tự T, kí tự 'M' dịch chuyển thêm 1 vị trí được kí tự 'N'. Vậy dòng văn bản 'R2F3M1' sau khi giải mã có kết quả là “TIN'.</p>
+            <p><b>Yêu cầu:</b> Hãy lập trình giúp Nam giải mã mật thư mà ban tổ chức đã cho.</p>
+            <p><b>Dữ liệu:</b> vào từ file văn bản <code>GIAIMA.INP</code> gồm một chuỗi kí tự chỉ chứa từng cặp chữ cái tiếng anh viết in và chữ số từ 0 đến 9 liên tục nhau. Chuỗi có độ dài tối đa 10<sup>6</sup> kí tự.</p>
+            <p><b>Kết quả:</b> ghi ra file văn bản <code>GIAIMA.OUT</code> ghi chuỗi đã được giải mã.</p>
+            <table class="example-table">
+                <tr><th>GIAIMA.INP</th><th>GIAIMA.OUT</th></tr>
+                <tr><td>S1F2Y2M1E3J4G2A4K3</td><td>THANHNIEN</td></tr>
+            </table>
+            <p><b>Giải thích:</b> S -> T, F -> G -> H, Y -> Z -> A, M -> N, E -> F -> G -> H, J -> K -> L -> M -> N, G -> H -> I, A -> B -> C -> D -> E, K -> L -> M -> N.</p>
+            <p><b>Ràng buộc:</b></p>
+            <ul>
+                <li>50% số điểm của bài tương ứng với các test chứa chuỗi có độ dài nhỏ hơn 1000 kí tự</li>
+                <li>50% số điểm còn lại không có ràng buộc nào thêm.</li>
+            </ul>
+        """
+    },
+    "7": {
+        "title": "Bài 7: Đếm đoạn con",
+        "input_file": "DEMDOANCON.INP",
+        "output_file": "DEMDOANCON.OUT",
+        "gen": generate_tests_demdoancon,
+        "content_html": """
+            <p>Chuỗi kí tự X được gọi là chuỗi con của Y khi chuỗi X được tạo thành bằng cách xóa đi một số kí tự (có thể không cần xóa kí tự nào) của Y mà không thay đổi trật tự sắp xếp vốn có của các kí tự trong Y. Ví dụ: chuỗi ABC là một chuỗi con của ADBC nhưng ACB thì không. Chuỗi kí tự A được gọi là một đoạn con của chuỗi B khi chuỗi A được tạo thành bằng cách chọn một đoạn kí tự liên tiếp nào đó của chuỗi B. Ví dụ: chuỗi XYZ là một đoạn con của chuỗi AXYZZ nhưng AYZ thì không. Cho xâu S gồm N chữ cái in hoa. Khoa muốn chọn một đoạn con của S sao cho đoạn con này có chứa chuỗi con là TIN</p>
+            <p><b>Yêu cầu:</b> Đếm số đoạn con khác nhau mà Khoa có thể chọn biết rằng 2 đoạn con khác nhau khi có ít nhất một vị trí được chọn khác nhau.</p>
+            <p><b>Dữ liệu:</b> vào từ file văn bản <code>DEMDOANCON.INP</code> gồm một chuỗi kí tự chứa các chữ cái tiếng Anh in hoa và không có khoảng trắng. Độ dài tối đa của chuỗi là 100000 kí tự.</p>
+            <p><b>Kết quả:</b> ghi ra file văn bản <code>DEMDOANCON.OUT</code> ghi một số nguyên duy nhất là số đoạn con khác nhau mà Khoa có thể chọn được.</p>
+            <table class="example-table">
+                <tr><th>DEMDOANCON.INP</th><th>DEMDOANCON.OUT</th></tr>
+                <tr><td>TATIAN</td><td>3</td></tr>
+            </table>
+            <p><b>Giải thích:</b> Khoa có thể chọn các đoạn con là TATIAN, ATIAN, TIAN. Cả 3 đoạn con này đều có chứa chuỗi con TIN.</p>
+            <p><b>Ràng buộc:</b></p>
+            <ul>
+                <li>50% số điểm của bài tương ứng với các test chứa chuỗi có độ dài &le; 100</li>
+                <li>25% số điểm của bài tương ứng với các test chứa chuỗi có độ dài &le; 10000</li>
+                <li>25% số điểm còn lại không có ràng buộc nào thêm.</li>
+            </ul>
+        """
+    },
+    "8": {
+        "title": "Bài 8: Tìm số",
+        "input_file": "TIMSO.INP",
+        "output_file": "TIMSO.OUT",
+        "gen": generate_tests_timso,
+        "content_html": """
+            <p>Cho số tự nhiên N, tìm số tự nhiên A thỏa mãn các điều kiện sau:</p>
+            <ul>
+                <li>A < N</li>
+                <li>A lớn nhất có thể.</li>
+                <li>Số lượng chữ số của A bằng số lượng chữ số của N</li>
+                <li>Tổng các chữ số của A bằng tổng các chữ số của N</li>
+            </ul>
+            <p><b>Yêu cầu:</b> Hãy tìm số thõa điều kiện của đề bài.</p>
+            <p><b>Dữ liệu:</b> vào từ file văn bản <code>TIMSO.INP</code> nhập số nguyên dương N (0 &le; N &le; 10<sup>15</sup>)</p>
+            <p><b>Kết quả:</b> ghi ra file văn bản <code>TIMSO.OUT</code> ghi ra số A duy nhất thỏa điều kiện của đề bài. Nếu không tìm được số nào thỏa mãn thì ghi ra 0.</p>
+            <table class="example-table">
+                <tr><th>TIMSO.INP</th><th>TIMSO.OUT</th></tr>
+                <tr><td>245</td><td>236</td></tr>
+                <tr><td>9</td><td>0</td></tr>
+            </table>
+            <p><b>Giải thích:</b></p>
+            <ul>
+                <li>N = 2 + 4 + 5 = 11; A = 2 + 3 + 6 = 11; số chữ số của A và N đều là 3 chữ số, số A < N và lớn nhất có thể.</li>
+                <li>N = 9, không có số A nào có 1 chữ số nào nhỏ hơn 9 và bằng 9 nên xuất kết quả ra 0</li>
+            </ul>
+            <p><b>Ràng buộc:</b></p>
+            <ul>
+                <li>40% số điểm của bài tương ứng với các test có N &le; 10<sup>4</sup></li>
+                <li>30% số điểm của bài tương ứng với các test có N &le; 10<sup>9</sup></li>
+                <li>30% số điểm còn lại không có ràng buộc nào thêm.</li>
+            </ul>
+        """
+    },
+    "9": {
+        "title": "Bài 9: Phần thưởng",
+        "input_file": "PHANTHUONG.INP",
+        "output_file": "PHANTHUONG.OUT",
+        "gen": generate_tests_phanthuong,
+        "content_html": """
+            <p>Trung thu năm nay chị Hằng chuẩn bị N phần quà được đánh số từ 1 đến N, phần quà thứ i (1 &le; i &le; n) có giá trị là Ai. Có M học sinh, mỗi học sinh có 1 phiếu bé ngoan được đánh số K. Học sinh được sử dụng phiếu bé ngoan chọn một phần quà có giá trị lớn nhất trong K phần quà đầu tiên. Cho biết số lượng của một phần quà là vô hạn.</p>
+            <p><b>Yêu cầu:</b> Hãy giúp chú Cuội tính giá trị phần quà lớn nhất mà mỗi học sinh được nhận.</p>
+            <p><b>Dữ liệu:</b> Vào từ file văn bản <code>PHANTHUONG.INP</code></p>
+            <ul>
+                <li>Dòng đầu chứa nhập N (0 < n &le; 10<sup>5</sup>)</li>
+                <li>Dòng 2 chứa N số nguyên dương Ai (1 &le; Ai &le; 10<sup>9</sup>)</li>
+                <li>Dòng 3 chứa số nguyên dương M (0 < m &le; 10<sup>5</sup>)</li>
+                <li>Dòng 4 chứa m số nguyên K (1 &le; K &le; N)</li>
+            </ul>
+            <p><b>Kết quả:</b> ghi ra file văn bản <code>PHANTHUONG.OUT</code> Ghi các số thõa mãn yêu cầu đề bài, mỗi số cách nhau khoảng trắng.</p>
+            <table class="example-table">
+                <tr><th>PHANTHUONG.INP</th><th>PHANTHUONG.OUT</th></tr>
+                <tr><td>5<br>1 3 4 3 5<br>3<br>5 2 4</td><td>5 3 4</td></tr>
+            </table>
+            <p><b>Giải thích:</b> Học sinh thứ nhất phiếu bé ngoan có giá trị 5 có nghĩa là học sinh đó được chọn phần quà có giá trị lớn nhất trong 5 phần quà đang có -> kết quả là 5. Học sinh thứ hai phiếu bé ngoan có giá trị là 2 nên được chọn phần quà có giá trị lớn nhất trong 2 phần quà đầu -> kết quả là 3.</p>
+            <p><b>Ràng buộc:</b></p>
+            <ul>
+                <li>50% số điểm của bài tương ứng với các test có N, M &le; 100</li>
+                <li>25% số điểm của bài tương ứng với các test có N, M &le; 10<sup>4</sup></li>
+                <li>25% số điểm còn lại không có ràng buộc nào thêm.</li>
+            </ul>
+        """
+    },
+    "10": {
+        "title": "Bài 10: Sơn lego",
+        "input_file": "LEGO.INP",
+        "output_file": "LEGO.OUT",
+        "gen": generate_tests_lego,
+        "content_html": """
+            <p>Hè về, Minh và Khoa chơi xây tháp bằng các khối lego màu trắng hình khối lập phương với kích thước cạnh là 1 đơn vị trên một tấm đế có kích thước M dòng và N cột. Sau khi xây xong hai bạn tiến hành sơn màu các bề mặt nhìn thấy được của tòa tháp.</p>
+            <p><b>Yêu cầu:</b> Hãy giúp Minh và Khoa đếm số mặt cần sơn.</p>
+            <p><b>Dữ liệu:</b> vào từ file văn bản <code>LEGO.INP</code></p>
+            <ul>
+                <li>Dòng đầu tiên chứa số nguyên M và N (1 &le; M, N &le; 200)</li>
+                <li>M dòng tiếp theo mỗi dòng chứa N số nguyên dương cách nhau khoảng trắng biểu thị số khối lego chồng lên nhau tại vị trí đó.</li>
+            </ul>
+            <p><b>Kết quả:</b> ghi ra file văn bản <code>LEGO.OUT</code> ghi số mặt cần sơn.</p>
+            <table class="example-table">
+                <tr><th>LEGO.INP</th><th>LEGO.OUT</th></tr>
+                <tr><td>4 4<br>1 2 0 1<br>0 0 3 0<br>1 1 0 1<br>2 0 2 3</td><td>66</td></tr>
+            </table>
+            <p><b>Giải thích:</b> Chỉ sơn các bề mặt nhìn thấy được, không tính bề mặt tấm đế.</p>
+            <p><b>Ràng buộc:</b></p>
+            <ul>
+                <li>50% số điểm của bài tương ứng với các test có M, N &le; 50</li>
+                <li>50% số điểm còn lại không có ràng buộc nào thêm.</li>
+            </ul>
+        """
     }
 }
 
@@ -260,14 +581,12 @@ def judge_submission(problem_id, language, code):
     tests = prob["gen"](100)
 
     with tempfile.TemporaryDirectory() as temp_dir:
-        # Lưu file source code
         if language == "cpp":
             source_file = os.path.join(temp_dir, "solution.cpp")
             exe_file = os.path.join(temp_dir, "solution.exe")
             with open(source_file, "w", encoding="utf-8") as f:
                 f.write(code)
 
-            # Biên dịch C++
             compile_cmd = ["g++", "-O2", source_file, "-o", exe_file]
             comp_proc = subprocess.run(compile_cmd, capture_output=True, text=True)
             if comp_proc.returncode != 0:
@@ -285,7 +604,6 @@ def judge_submission(problem_id, language, code):
 
         timeout_sec = TIME_LIMITS.get(language, 2.0)
 
-        # Tiến hành chấm 100 test cases
         for idx, test in enumerate(tests, 1):
             inp_path = os.path.join(temp_dir, inp_name)
             out_path = os.path.join(temp_dir, out_name)
@@ -318,7 +636,6 @@ def judge_submission(problem_id, language, code):
             with open(out_path, "r", encoding="utf-8") as f:
                 user_output = f.read()
 
-            # So sánh đáp án
             expected_tokens = test["output"].strip().split()
             actual_tokens = user_output.strip().split()
 
