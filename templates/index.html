@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Chấm Bài Online Judge</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background-color: #f8f9fa; 
+            color: #333; 
+        }
+        .container { 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 25px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        h2 { 
+            margin-top: 0; 
+            color: #0056b3; 
+            border-bottom: 2px solid #0056b3; 
+            padding-bottom: 10px; 
+        }
+        
+        /* Dropdown chọn bài */
+        .problem-select-box { 
+            background: #e9ecef; 
+            padding: 15px; 
+            border-radius: 6px; 
+            margin-bottom: 20px; 
+        }
+        select { 
+            font-size: 16px; 
+            padding: 8px 12px; 
+            border-radius: 4px; 
+            border: 1px solid #ccc; 
+            width: 100%; 
+            max-width: 400px; 
+        }
+        
+        /* Khung hiển thị đề bài */
+        .problem-card { 
+            border: 1px solid #dee2e6; 
+            border-radius: 6px; 
+            padding: 20px; 
+            margin-bottom: 25px; 
+            background: #fff; 
+        }
+        .problem-title { 
+            font-size: 22px; 
+            color: #212529; 
+            font-weight: bold; 
+            margin-top: 0; 
+        }
+        .meta-info { 
+            font-size: 14px; 
+            color: #6c757d; 
+            margin-bottom: 15px; 
+            background: #f1f3f5; 
+            padding: 10px; 
+            border-radius: 4px; 
+        }
+        .meta-info span { 
+            margin-right: 20px; 
+        }
+        
+        /* Bảng ví dụ trong đề bài */
+        .example-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 15px 0; 
+            font-family: monospace; 
+        }
+        .example-table th, .example-table td { 
+            border: 1px solid #ccc; 
+            padding: 10px; 
+            vertical-align: top; 
+            text-align: left; 
+        }
+        .example-table th { 
+            background: #f1f1f1; 
+        }
+        .example-table td { 
+            background: #fafafa; 
+            white-space: pre-wrap; 
+        }
+
+        /* Vùng nhập code và nộp bài */
+        textarea { 
+            width: 100%; 
+            height: 260px; 
+            font-family: 'Consolas', 'Courier New', monospace; 
+            font-size: 14px; 
+            padding: 10px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+            box-sizing: border-box; 
+        }
+        button { 
+            background-color: #28a745; 
+            color: white; 
+            font-size: 16px; 
+            padding: 10px 25px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-weight: bold; 
+        }
+        button:hover { 
+            background-color: #218838; 
+        }
+
+        /* Màn hình hiển thị kết quả chấm */
+        .result-box { 
+            margin-top: 20px; 
+            padding: 15px; 
+            border-radius: 6px; 
+            background: #f8f9fa; 
+            border: 1px solid #e9ecef; 
+        }
+        .AC { color: #28a745; font-weight: bold; }
+        .WA, .TLE, .RTE, .MLE, .OLE, .CE { color: #dc3545; font-weight: bold; }
+        pre { 
+            background: #272822; 
+            color: #f8f8f2; 
+            padding: 12px; 
+            border-radius: 4px; 
+            overflow-x: auto; 
+            font-size: 13px; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Hệ Thống Chấm Bài Trực Tuyến</h2>
+
+    <!-- Menu chọn bài tập -->
+    <div class="problem-select-box">
+        <label for="problem_id"><strong>Bấm chọn bài tập để xem đề và nộp bài:</strong></label><br><br>
+        <select id="problem_id" onchange="loadProblem()">
+            {% for pid, prob in problems.items() %}
+                <option value="{{ pid }}">{{ prob.title }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Khung hiển thị chi tiết đề bài -->
+    <div class="problem-card">
+        <div class="problem-title" id="p_title"></div>
+        <div class="meta-info">
+            <span><b>File Input:</b> <code id="p_inp"></code></span>
+            <span><b>File Output:</b> <code id="p_out"></code></span>
+            <span><b>Giới hạn:</b> C++ (1.0s) | Python (3.0s)</span>
+        </div>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+        <div id="p_content"></div>
+    </div>
+
+    <!-- Khung nộp bài -->
+    <div class="problem-card">
+        <h3>Nộp Mã Nguồn</h3>
+        <label for="language"><b>Ngôn ngữ:</b></label>
+        <select id="language" style="width: auto; margin-bottom: 10px;">
+            <option value="cpp">C++ (g++)</option>
+            <option value="python">Python 3</option>
+        </select>
+        <br>
+        <textarea id="code" placeholder="Dán code C++ (có freopen) hoặc Python vào đây..."></textarea><br><br>
+        <button onclick="submitCode()">NỘP BÀI</button>
+
+        <!-- Trạng thái Kết quả -->
+        <div class="result-box">
+            <h4 style="margin: 0 0 10px 0;">Kết quả chấm: <span id="status">Chưa nộp</span></h4>
+            <div id="detail_container" style="display: none;">
+                <pre id="detail"></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dữ liệu JSON từ Flask nhúng an toàn -->
+<script id="problems-data" type="application/json">
+    {{ problems | tojson | safe }}
+</script>
+
+<script>
+    const problems = JSON.parse(document.getElementById('problems-data').textContent);
+
+    function loadProblem() {
+        const pid = document.getElementById("problem_id").value;
+        const p = problems[pid];
+
+        document.getElementById("p_title").innerText = p.title;
+        document.getElementById("p_inp").innerText = p.input_file;
+        document.getElementById("p_out").innerText = p.output_file;
+        document.getElementById("p_content").innerHTML = p.content_html;
+        
+        document.getElementById("status").innerText = "Chưa nộp";
+        document.getElementById("status").className = "";
+        document.getElementById("detail_container").style.display = "none";
+    }
+
+    loadProblem();
+
+    async function submitCode() {
+        const statusEl = document.getElementById("status");
+        const detailContainer = document.getElementById("detail_container");
+        const detailEl = document.getElementById("detail");
+
+        statusEl.innerText = "Đang chấm 100 test cases...";
+        statusEl.className = "";
+        detailContainer.style.display = "none";
+
+        const res = await fetch("/submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                problem_id: document.getElementById("problem_id").value,
+                language: document.getElementById("language").value,
+                code: document.getElementById("code").value
+            })
+        });
+
+        const data = await res.json();
+        statusEl.innerText = data.status;
+        statusEl.className = data.status;
+
+        detailEl.innerText = data.detail;
+        detailContainer.style.display = "block";
+    }
+</script>
+
+</body>
+</html>
