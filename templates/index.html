@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VNOI Style Online Judge - Purple Edition</title>
+    <title>Online Judge - Purple Edition</title>
     <style>
         :root {
             --primary: #6c5ce7;
@@ -14,8 +14,8 @@
             --card-bg: #ffffff;
             --text-color: #2b2b2b;
             --border-color: #e2e8f0;
-            --ac-color: #00b894;
-            --wa-color: #d63031;
+            --ac-color: #2ed573;
+            --wa-color: #ff4757;
         }
 
         * {
@@ -65,49 +65,6 @@
             max-width: 1200px; 
             margin: 24px auto; 
             padding: 0 16px;
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 20px;
-        }
-
-        /* Sidebar - Problem Selector */
-        .sidebar-card {
-            background: var(--card-bg);
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            padding: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            height: fit-content;
-        }
-
-        .sidebar-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--dark-purple);
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--primary-light);
-        }
-
-        .problem-list-select {
-            width: 100%;
-            padding: 10px;
-            font-size: 14px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            background-color: white;
-            color: var(--text-color);
-            cursor: pointer;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .problem-list-select:focus {
-            border-color: var(--primary);
-        }
-
-        /* Main Content */
-        .main-content {
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -121,6 +78,66 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark-purple);
+            margin-top: 0;
+            margin-bottom: 16px;
+        }
+
+        /* Problem Table Style */
+        .problem-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .problem-table th, .problem-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .problem-table th {
+            background-color: #2b2b2b;
+            color: white;
+            font-weight: 600;
+        }
+
+        .problem-table tr:hover {
+            background-color: var(--primary-light);
+            cursor: pointer;
+        }
+
+        .problem-table tr.active-row {
+            background-color: #e8e0ff;
+            font-weight: bold;
+        }
+
+        .status-icon {
+            font-size: 16px;
+            text-align: center;
+            width: 40px;
+        }
+
+        .status-ac {
+            color: var(--ac-color);
+            font-weight: bold;
+        }
+
+        .status-wa {
+            color: var(--wa-color);
+            font-weight: bold;
+        }
+
+        .problem-link {
+            color: #2e86de;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Detail & Submission Panel */
         .problem-header {
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 16px;
@@ -128,7 +145,7 @@
         }
 
         .problem-title { 
-            font-size: 24px; 
+            font-size: 22px; 
             color: var(--dark-purple); 
             font-weight: 700; 
             margin: 0 0 12px 0; 
@@ -156,15 +173,8 @@
             border-radius: 3px;
         }
 
-        /* Problem Details Styling */
-        #p_content p {
-            line-height: 1.6;
-        }
-
-        #p_content ul {
-            padding-left: 20px;
-            line-height: 1.6;
-        }
+        #p_content p { line-height: 1.6; }
+        #p_content ul { padding-left: 20px; line-height: 1.6; }
 
         .example-table { 
             width: 100%; 
@@ -192,15 +202,7 @@
             white-space: pre-wrap; 
         }
 
-        /* Editor & Submit Section */
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--dark-purple);
-            margin-top: 0;
-            margin-bottom: 16px;
-        }
-
+        /* Editor Section */
         .form-group {
             margin-bottom: 16px;
         }
@@ -223,7 +225,7 @@
 
         textarea { 
             width: 100%; 
-            height: 300px; 
+            height: 250px; 
             font-family: 'Consolas', 'Courier New', monospace; 
             font-size: 14px; 
             padding: 12px; 
@@ -232,7 +234,6 @@
             box-sizing: border-box; 
             outline: none;
             resize: vertical;
-            transition: border-color 0.2s;
         }
 
         textarea:focus {
@@ -249,16 +250,12 @@
             cursor: pointer; 
             font-weight: 600; 
             transition: background 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
         }
 
         .btn-submit:hover { 
             background-color: var(--primary-hover); 
         }
 
-        /* Judge Result Styling */
         .result-box { 
             margin-top: 20px; 
             padding: 16px; 
@@ -273,7 +270,7 @@
         }
 
         .AC { color: var(--ac-color); }
-        .WA, .TLE, .RTE, .MLE, .OLE, .CE { color: var(--wa-color); }
+        .WA, .TLE, .RTE, .CE { color: var(--wa-color); }
 
         pre.console-output { 
             background: #1e1e2e; 
@@ -285,88 +282,120 @@
             font-family: 'Consolas', monospace;
             margin-top: 10px;
         }
-
-        @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-        }
     </style>
 </head>
 <body>
 
 <div class="vnoi-navbar">
     <div class="vnoi-brand">
-        VNOI Online Judge <span>Purple</span>
+        Online Judge <span>PURPLE</span>
     </div>
 </div>
 
 <div class="container">
-    <!-- Sidebar -->
-    <div class="sidebar-card">
-        <div class="sidebar-title">Danh sách bài tập</div>
-        <select id="problem_id" class="problem-list-select" onchange="loadProblem()">
-            {% for pid, prob in problems.items() %}
-                <option value="{{ pid }}">{{ prob.title }}</option>
-            {% endfor %}
-        </select>
+    <!-- Danh sách bài dạng bảng -->
+    <div class="vnoi-card">
+        <div class="section-title">Danh sách bài</div>
+        <table class="problem-table">
+            <thead>
+                <tr>
+                    <th style="width: 50px; text-align: center;">✔</th>
+                    <th style="width: 80px;">ID</th>
+                    <th>Tên bài</th>
+                    <th style="width: 180px;">File Input / Output</th>
+                    <th style="width: 80px;">Điểm</th>
+                </tr>
+            </thead>
+            <tbody id="problem-list-body">
+                {% for pid, prob in problems.items() %}
+                <tr id="row-{{ pid }}" onclick="selectProblem('{{ pid }}')">
+                    <td class="status-icon" id="status-icon-{{ pid }}"></td>
+                    <td><strong>P{{ pid }}</strong></td>
+                    <td><a class="problem-link" href="javascript:void(0)">{{ prob.title }}</a></td>
+                    <td><code>{{ prob.input_file }}</code> / <code>{{ prob.output_file }}</code></td>
+                    <td>100</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- Đề bài -->
-        <div class="vnoi-card">
-            <div class="problem-header">
-                <div class="problem-title" id="p_title"></div>
-                <div class="meta-tags">
-                    <span class="tag">Input: <code id="p_inp"></code></span>
-                    <span class="tag">Output: <code id="p_out"></code></span>
-                    <span class="tag">Giới hạn: C++ (1.0s) | Python (3.0s)</span>
-                </div>
+    <!-- Chi tiết bài tập & Khung nộp bài -->
+    <div class="vnoi-card" id="problem-detail-card">
+        <div class="problem-header">
+            <div class="problem-title" id="p_title"></div>
+            <div class="meta-tags">
+                <span class="tag">Input: <code id="p_inp"></code></span>
+                <span class="tag">Output: <code id="p_out"></code></span>
+                <span class="tag">Giới hạn thời gian: C++ (1.0s) | Python (3.0s)</span>
             </div>
-            <div id="p_content"></div>
+        </div>
+        
+        <div id="p_content"></div>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 24px 0;">
+
+        <!-- Khung nộp bài -->
+        <div class="section-title">Nộp bài giải</div>
+        
+        <div class="form-group">
+            <label for="language">Ngôn ngữ lập trình:</label>
+            <select id="language" class="lang-select">
+                <option value="cpp">C++ (g++)</option>
+                <option value="python">Python 3</option>
+            </select>
         </div>
 
-        <!-- Khung Nộp bài -->
-        <div class="vnoi-card">
-            <div class="section-title">Nộp bài giải</div>
-            
-            <div class="form-group">
-                <label for="language">Ngôn ngữ lập trình:</label>
-                <select id="language" class="lang-select">
-                    <option value="cpp">C++ (g++)</option>
-                    <option value="python">Python 3</option>
-                </select>
-            </div>
+        <div class="form-group">
+            <textarea id="code" placeholder="Nhập mã nguồn của bạn vào đây..."></textarea>
+        </div>
 
-            <div class="form-group">
-                <textarea id="code" placeholder="Nhập mã nguồn của bạn vào đây..."></textarea>
-            </div>
+        <button class="btn-submit" onclick="submitCode()">Nộp bài</button>
 
-            <button class="btn-submit" onclick="submitCode()">Nộp bài</button>
-
-            <div class="result-box">
-                <div class="result-status">Trạng thái: <span id="status">Chưa nộp</span></div>
-                <div id="detail_container" style="display: none;">
-                    <pre id="detail" class="console-output"></pre>
-                </div>
+        <div class="result-box">
+            <div class="result-status">Trạng thái: <span id="status">Chưa nộp</span></div>
+            <div id="detail_container" style="display: none;">
+                <pre id="detail" class="console-output"></pre>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Dữ liệu JSON từ Flask -->
 <script id="problems-data" type="application/json">
     {{ problems | tojson | safe }}
 </script>
 
 <script>
     const problems = JSON.parse(document.getElementById('problems-data').textContent);
+    let currentPid = "1";
 
-    function loadProblem() {
-        const pid = document.getElementById("problem_id").value;
+    // Khởi tạo và khôi phục trạng thái từ LocalStorage
+    function initStatus() {
+        for (let pid in problems) {
+            const savedStatus = localStorage.getItem("oj_status_" + pid);
+            const iconEl = document.getElementById("status-icon-" + pid);
+            if (savedStatus === "AC") {
+                iconEl.innerHTML = '<span class="status-ac">✔</span>';
+            } else if (savedStatus === "WA") {
+                iconEl.innerHTML = '<span class="status-wa">❌</span>';
+            } else {
+                iconEl.innerHTML = '';
+            }
+        }
+    }
+
+    function selectProblem(pid) {
+        currentPid = pid;
+        
+        // Highlight hàng được chọn
+        for (let id in problems) {
+            const row = document.getElementById("row-" + id);
+            if (row) row.classList.remove("active-row");
+        }
+        document.getElementById("row-" + pid).classList.add("active-row");
+
+        // Cập nhật nội dung bài tập
         const p = problems[pid];
-
         document.getElementById("p_title").innerText = p.title;
         document.getElementById("p_inp").innerText = p.input_file;
         document.getElementById("p_out").innerText = p.output_file;
@@ -377,7 +406,9 @@
         document.getElementById("detail_container").style.display = "none";
     }
 
-    loadProblem();
+    // Chọn bài 1 mặc định khi mở trang
+    selectProblem("1");
+    initStatus();
 
     async function submitCode() {
         const statusEl = document.getElementById("status");
@@ -393,7 +424,7 @@
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    problem_id: document.getElementById("problem_id").value,
+                    problem_id: currentPid,
                     language: document.getElementById("language").value,
                     code: document.getElementById("code").value
                 })
@@ -405,6 +436,19 @@
 
             detailEl.innerText = data.detail;
             detailContainer.style.display = "block";
+
+            // Cập nhật biểu tượng trạng thái ✔ hoặc ❌
+            const iconEl = document.getElementById("status-icon-" + currentPid);
+            if (data.status === "AC") {
+                iconEl.innerHTML = '<span class="status-ac">✔</span>';
+                localStorage.setItem("oj_status_" + currentPid, "AC");
+            } else {
+                // Nếu chưa từng AC thì đánh dấu ❌
+                if (localStorage.getItem("oj_status_" + currentPid) !== "AC") {
+                    iconEl.innerHTML = '<span class="status-wa">❌</span>';
+                    localStorage.setItem("oj_status_" + currentPid, "WA");
+                }
+            }
         } catch (err) {
             statusEl.innerText = "Lỗi kết nối";
             statusEl.className = "WA";
