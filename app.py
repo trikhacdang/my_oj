@@ -3,6 +3,7 @@ import sys
 import random
 import subprocess
 import tempfile
+from collections import Counter
 from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
@@ -20,7 +21,7 @@ def is_prime(n):
             return False
     return True
 
-# ==================== 1. TEST GENERATORS ====================
+# ==================== TEST GENERATORS ====================
 def generate_tests_quyhoach(count=100):
     tests = []
     tests.append({"input": "7\n4 7 2 9 8 2 6\n", "output": "9 2"})
@@ -122,9 +123,8 @@ def generate_tests_somax(count=100):
         
     return tests
 
-# Test Generators cho 6 bài mới
 def generate_tests_xlds(count=100):
-    sample_inp = "10\nLe Lo\nLam\nTran\nTrui Trui\nNguyen\nVan TeO\nKaka\nCR 9\nTruong\nTHCS Hong Bang Q5 Tp HCM\nA\nTran Thi\nBe cHi\nHoang Le\nThong nhat chi\nTran Lam\n"
+    sample_inp = "10\nLe Lo Lam\nTran Trui Trui\nNguyen Van TeO\nKaka\nCR 9\nTruong THCS Hong Bang Q5 Tp HCM\nA\nTran Thi Be cHi\nHoang Le Thong nhat chi\nTran Lam\n"
     sample_out = "2 ho ten co 1 tu\n2 ho ten co 2 tu\n3 ho ten co 3 tu\n1 ho ten co 4 tu\n1 ho ten co 5 tu\n1 ho ten co 7 tu\nTrui\nCR 9\nA\nHOANG LE THONG NHAT CHI\nTRAN THI BE CHI\nTRUONG THCS HONG BANG Q5 TP HCM\nKAKA\nLE LO LAM\nTRAN LAM\nNGUYEN VAN TEO\nTRAN TRUI TRUI"
     tests = [{"input": sample_inp, "output": sample_out}]
     
@@ -281,7 +281,60 @@ def generate_tests_lego(count=100):
         tests.append({"input": inp_str, "output": str(ans)})
     return tests
 
-# ==================== 2. KHAI BÁO DANH SÁCH BÀI TẬP ====================
+def generate_tests_dacbiet(count=100):
+    tests = []
+    tests.append({"input": "7\n2 3 7 6 8 8 6\n", "output": "3\n2"})
+    tests.append({"input": "4\n5 5 5 5\n", "output": "NO"})
+
+    remaining = count - len(tests)
+    for i in range(remaining):
+        n = random.randint(1, 100) if i < 50 else random.randint(101, 100000)
+        heights = [random.randint(1, 1000000) for _ in range(n)]
+        
+        counts = Counter(heights)
+        specials = [h for h, cnt in counts.items() if cnt == 1]
+        
+        inp_str = f"{n}\n" + " ".join(map(str, heights)) + "\n"
+        if not specials:
+            out_str = "NO"
+        else:
+            out_str = f"{len(specials)}\n{min(specials)}"
+            
+        tests.append({"input": inp_str, "output": out_str})
+    return tests
+
+def generate_tests_gopmang(count=100):
+    sample_inp = "5\n1 2 3 4 5\n5\n6 7 8 9 10\n"
+    sample_out = "6 7 8 9 10 1 2 3 4 5\n1 6 2 7 3 8 4 9 5 10"
+    tests = [{"input": sample_inp, "output": sample_out}]
+
+    remaining = count - len(tests)
+    for i in range(remaining):
+        n = random.randint(1, 50) if i < 50 else random.randint(51, 10000)
+        m = random.randint(1, 50) if i < 50 else random.randint(51, 10000)
+        a = [random.randint(1, 1000000000) for _ in range(n)]
+        b = [random.randint(1, 1000000000) for _ in range(m)]
+
+        # Cách 1
+        c1 = b + a
+        
+        # Cách 2
+        c2 = []
+        min_len = min(n, m)
+        for idx in range(min_len):
+            c2.append(a[idx])
+            c2.append(b[idx])
+        if n > min_len:
+            c2.extend(a[min_len:])
+        elif m > min_len:
+            c2.extend(b[min_len:])
+
+        inp_str = f"{n}\n" + " ".join(map(str, a)) + f"\n{m}\n" + " ".join(map(str, b)) + "\n"
+        out_str = " ".join(map(str, c1)) + "\n" + " ".join(map(str, c2))
+        tests.append({"input": inp_str, "output": out_str})
+    return tests
+
+# ==================== DANH SÁCH BÀI TẬP ====================
 PROBLEMS = {
     "1": {
         "title": "Bài 1: Quy hoạch",
@@ -420,12 +473,6 @@ PROBLEMS = {
                     <td>2 ho ten co 1 tu<br>2 ho ten co 2 tu<br>3 ho ten co 3 tu<br>1 ho ten co 4 tu<br>1 ho ten co 5 tu<br>1 ho ten co 7 tu<br>Trui<br>CR 9<br>A<br>HOANG LE THONG NHAT CHI<br>TRAN THI BE CHI<br>TRUONG THCS HONG BANG Q5 TP HCM<br>KAKA<br>LE LO LAM<br>TRAN LAM<br>NGUYEN VAN TEO<br>TRAN TRUI TRUI</td>
                 </tr>
             </table>
-            <p><b>Giải thích:</b></p>
-            <ul>
-                <li>2 họ tên có 1 từ là A và Kaka, 2 họ tên có 2 từ là CR 9 và Tran Lam, …</li>
-                <li>Có 2 tên trong danh sách cùng có 4 kí tự là Trui và Kaka. Tuy nhiên ta lấy tên dài nhất gặp đầu tiên là Trui</li>
-                <li>Vì sắp xếp tăng dần với ưu tiên 1 là tên nên CR 9 sẽ được xếp trước A do 9 xếp trước A trong bảng mã ASCII. Trường hợp LE LO LAM và TRAN LAM có tên giống nhau nên lúc này ta sẽ sắp xếp dựa trên ưu tiên 2 là họ. LE LO sẽ xếp trước TRAN do L đứng trước T trong bảng mã ASCII.</li>
-            </ul>
             <p><b>Ràng buộc:</b></p>
             <ul>
                 <li>50% số điểm của bài tương ứng với các test có N &le; 100</li>
@@ -448,7 +495,6 @@ PROBLEMS = {
                 <tr><th>GIAIMA.INP</th><th>GIAIMA.OUT</th></tr>
                 <tr><td>S1F2Y2M1E3J4G2A4K3</td><td>THANHNIEN</td></tr>
             </table>
-            <p><b>Giải thích:</b> S -> T, F -> G -> H, Y -> Z -> A, M -> N, E -> F -> G -> H, J -> K -> L -> M -> N, G -> H -> I, A -> B -> C -> D -> E, K -> L -> M -> N.</p>
             <p><b>Ràng buộc:</b></p>
             <ul>
                 <li>50% số điểm của bài tương ứng với các test chứa chuỗi có độ dài nhỏ hơn 1000 kí tự</li>
@@ -470,7 +516,6 @@ PROBLEMS = {
                 <tr><th>DEMDOANCON.INP</th><th>DEMDOANCON.OUT</th></tr>
                 <tr><td>TATIAN</td><td>3</td></tr>
             </table>
-            <p><b>Giải thích:</b> Khoa có thể chọn các đoạn con là TATIAN, ATIAN, TIAN. Cả 3 đoạn con này đều có chứa chuỗi con TIN.</p>
             <p><b>Ràng buộc:</b></p>
             <ul>
                 <li>50% số điểm của bài tương ứng với các test chứa chuỗi có độ dài &le; 100</li>
@@ -500,11 +545,6 @@ PROBLEMS = {
                 <tr><td>245</td><td>236</td></tr>
                 <tr><td>9</td><td>0</td></tr>
             </table>
-            <p><b>Giải thích:</b></p>
-            <ul>
-                <li>N = 2 + 4 + 5 = 11; A = 2 + 3 + 6 = 11; số chữ số của A và N đều là 3 chữ số, số A < N và lớn nhất có thể.</li>
-                <li>N = 9, không có số A nào có 1 chữ số nào nhỏ hơn 9 và bằng 9 nên xuất kết quả ra 0</li>
-            </ul>
             <p><b>Ràng buộc:</b></p>
             <ul>
                 <li>40% số điểm của bài tương ứng với các test có N &le; 10<sup>4</sup></li>
@@ -533,7 +573,6 @@ PROBLEMS = {
                 <tr><th>PHANTHUONG.INP</th><th>PHANTHUONG.OUT</th></tr>
                 <tr><td>5<br>1 3 4 3 5<br>3<br>5 2 4</td><td>5 3 4</td></tr>
             </table>
-            <p><b>Giải thích:</b> Học sinh thứ nhất phiếu bé ngoan có giá trị 5 có nghĩa là học sinh đó được chọn phần quà có giá trị lớn nhất trong 5 phần quà đang có -> kết quả là 5. Học sinh thứ hai phiếu bé ngoan có giá trị là 2 nên được chọn phần quà có giá trị lớn nhất trong 2 phần quà đầu -> kết quả là 3.</p>
             <p><b>Ràng buộc:</b></p>
             <ul>
                 <li>50% số điểm của bài tương ứng với các test có N, M &le; 100</li>
@@ -560,17 +599,85 @@ PROBLEMS = {
                 <tr><th>LEGO.INP</th><th>LEGO.OUT</th></tr>
                 <tr><td>4 4<br>1 2 0 1<br>0 0 3 0<br>1 1 0 1<br>2 0 2 3</td><td>66</td></tr>
             </table>
-            <p><b>Giải thích:</b> Chỉ sơn các bề mặt nhìn thấy được, không tính bề mặt tấm đế.</p>
             <p><b>Ràng buộc:</b></p>
             <ul>
                 <li>50% số điểm của bài tương ứng với các test có M, N &le; 50</li>
                 <li>50% số điểm còn lại không có ràng buộc nào thêm.</li>
             </ul>
         """
+    },
+    "11": {
+        "title": "Bài 11: Tòa nhà đặc biệt",
+        "input_file": "DACBIET.INP",
+        "output_file": "DACBIET.OUT",
+        "gen": generate_tests_dacbiet,
+        "content_html": """
+            <p>Trên một dãy phố có N tòa nhà. Tòa nhà đầu tiên trên con phố có số thứ tự là 0. Tòa nhà thứ i có độ cao là h[i]. Độ cao của các toàn nhà trên con phố là các số nguyên dương. Để thực hiện việc quy hoạch thành phố, nhà nước đặt ra tiêu chuẩn sau: nếu độ cao của tòa nhà nào chỉ xuất hiện 1 lần trên dãy phố thì tòa nhà đó là “đặc biệt”.</p>
+            <p><b>Yêu cầu:</b> Đếm số lượng tòa nhà “đặc biệt”.</p>
+            <p><b>Dữ liệu:</b> vào từ file văn bản <code>DACBIET.INP</code> gồm</p>
+            <ul>
+                <li>Dòng đầu chứa một số nguyên dương N là số tòa nhà và x là độ cao chuẩn (1 &le; N &le; 10<sup>5</sup>).</li>
+                <li>Dòng tiếp theo chứa N số nguyên dương h[i] cách nhau khoảng trắng là độ cao của tòa nhà thứ i trong dãy phố (1 &le; h[i] &le; 10<sup>6</sup>)</li>
+            </ul>
+            <p><b>Kết quả:</b> ghi ra file văn bản <code>DACBIET.OUT</code> gồm</p>
+            <ul>
+                <li>Dòng đầu nếu không có tòa nhà đặc biệt thì ghi "NO”, ngược lại ghi số lượng tòa nhà đặc biệt tìm thấy.</li>
+                <li>Dòng tiếp theo ghi chiều cao nhỏ nhất của các tòa nhà đặc biệt.</li>
+            </ul>
+            <table class="example-table">
+                <tr><th>DACBIET.INP</th><th>DACBIET.OUT</th></tr>
+                <tr><td>7<br>2 3 7 6<br>8 8 6</td><td>3<br>2</td></tr>
+            </table>
+            <p><b>Giải thích:</b> Có 3 tòa nhà đặc biệt với chiều cao là 2, 3, 7 và tòa nhà đặc biệt có chiều cao nhỏ nhất là 2.</p>
+            <p><b>Ràng buộc:</b></p>
+            <ul>
+                <li>50% số điểm của bài tương ứng với các test có n &le; 10<sup>2</sup>.</li>
+                <li>50% số điểm của bài tương ứng với các test có n &le; 10<sup>5</sup>.</li>
+            </ul>
+        """
+    },
+    "12": {
+        "title": "Bài 12: Gộp mảng theo yêu cầu",
+        "input_file": "GOPMANG.INP",
+        "output_file": "GOPMANG.OUT",
+        "gen": generate_tests_gopmang,
+        "content_html": """
+            <p>Trong một bài toán xử lý dữ liệu, người ta thường cần kết hợp các dãy số để thuận tiện cho việc lưu trữ và xử lý.</p>
+            <p>Cho hai mảng số nguyên A và B. Hai mảng được đánh số từ 1 đến số phần tử của mỗi mảng.</p>
+            <p><b>Yêu cầu thực hiện hai cách gộp mảng sau:</b></p>
+            <ul>
+                <li><b>Cách 1:</b> Tạo mảng C bằng cách đưa toàn bộ các phần tử của mảng B vào trước, sau đó đưa toàn bộ các phần tử của mảng A vào sau.</li>
+                <li><b>Cách 2:</b> Tạo mảng C bằng cách lần lượt lấy một phần tử của A, rồi một phần tử của B, cứ như vậy cho đến khi đã sử dụng hết phần tử của một trong hai mảng. Nếu một mảng còn phần tử chưa được sử dụng thì đưa các phần tử còn lại vào cuối mảng C.</li>
+            </ul>
+            <p>Hãy lập trình thực hiện hai cách gộp trên và in kết quả.</p>
+            <p><b>Dữ liệu:</b> Vào từ file văn bản <code>GOPMANG.INP</code>:</p>
+            <ul>
+                <li>Dòng thứ nhất chứa số nguyên n là số phần tử của mảng A (1 &le; n &le; 10<sup>5</sup>).</li>
+                <li>Dòng thứ hai chứa n số nguyên là các phần tử của mảng A (1 &le; a[i] &le; 10<sup>9</sup>).</li>
+                <li>Dòng thứ ba chứa số nguyên m là số phần tử của mảng B (1 &le; m &le; 10<sup>5</sup>).</li>
+                <li>Dòng thứ tư chứa m số nguyên là các phần tử của mảng B (1 &le; b[i] &le; 10<sup>9</sup>).</li>
+            </ul>
+            <p>Các phần tử trên cùng một dòng được phân cách bởi một khoảng trắng.</p>
+            <p><b>Kết quả:</b> Ghi ra file kết quả <code>GOPMANG.OUT</code>:</p>
+            <ul>
+                <li>Dòng thứ nhất in các phần tử của mảng C sau khi gộp theo Cách 1.</li>
+                <li>Dòng thứ hai in các phần tử của mảng C sau khi gộp theo Cách 2.</li>
+            </ul>
+            <p>Các phần tử trên mỗi dòng được phân cách bởi một khoảng trắng.</p>
+            <table class="example-table">
+                <tr><th>GOPMANG.INP</th><th>GOPMANG.OUT</th></tr>
+                <tr><td>5<br>1 2 3 4 5<br>5<br>6 7 8 9 10</td><td>6 7 8 9 10 1 2 3 4 5<br>1 6 2 7 3 8 4 9 5 10</td></tr>
+            </table>
+            <p><b>Ràng buộc:</b></p>
+            <ul>
+                <li>50% số điểm có n, m &le; 10<sup>2</sup>.</li>
+                <li>50% số điểm còn lại không có ràng buộc gì thêm.</li>
+            </ul>
+        """
     }
 }
 
-# ==================== 3. HÀM CHẤM BÀI TỰ ĐỘNG ====================
+# ==================== JUDGE ENGINE ====================
 def judge_submission(problem_id, language, code):
     prob = PROBLEMS.get(problem_id)
     if not prob:
@@ -644,7 +751,7 @@ def judge_submission(problem_id, language, code):
 
     return "AC", f"Hoàn thành! Bạn đã vượt qua tất cả {len(tests)}/{len(tests)} test cases."
 
-# ==================== 4. CÁC ROUTE CỦA WEB FLASK ====================
+# ==================== FLASK ROUTES ====================
 @app.route("/")
 def index():
     problems_data = {}
