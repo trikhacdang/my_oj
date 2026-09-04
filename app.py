@@ -739,7 +739,7 @@ PROBLEMS = {
             <p><b>Yêu cầu:</b> Đếm số lượng tòa nhà “đặc biệt”.</p>
             <p><b>Dữ liệu:</b> vào từ file văn bản <code>DACBIET.INP</code> gồm</p>
             <ul>
-                <li>Dòng đầu chứa một số nguyên dương N là số tòa nhà và x là độ cao chuẩn (1 &le; N &le; 10<sup>5</sup>).</li>
+                <li>Dòng đầu chứa một số nguyên dương N là số tòa nhà (1 &le; N &le; 10<sup>5</sup>).</li>
                 <li>Dòng tiếp theo chứa N số nguyên dương h[i] cách nhau khoảng trắng là độ cao của tòa nhà thứ i trong dãy phố (1 &le; h[i] &le; 10<sup>6</sup>)</li>
             </ul>
             <p><b>Kết quả:</b> ghi ra file văn bản <code>DACBIET.OUT</code> gồm</p>
