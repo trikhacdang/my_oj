@@ -21,7 +21,7 @@ def is_prime(n):
             return False
     return True
 
-# ==================== TEST GENERATORS ====================
+# ==================== TEST GENERATORS (BÀI 1 - 12) ====================
 def generate_tests_quyhoach(count=100):
     tests = []
     tests.append({"input": "7\n4 7 2 9 8 2 6\n", "output": "9 2"})
@@ -331,7 +331,133 @@ def generate_tests_gopmang(count=100):
         tests.append({"input": inp_str, "output": out_str})
     return tests
 
-# ==================== DANH SÁCH BÀI TẬP ====================
+# ==================== TEST GENERATORS (BÀI 13 - 16 MỚI) ====================
+def generate_tests_demso(count=100):
+    tests = [{"input": "12 3\n2 3 3 3 5 8 8 8 7 6 7 6\n", "output": "3 8"}]
+    remaining = count - len(tests)
+    for i in range(remaining):
+        n = random.randint(1, 1000) if i < 50 else random.randint(1001, 100000)
+        k = random.randint(1, n)
+        arr = [random.randint(1, 1000000) for _ in range(n)]
+        
+        freq = Counter(arr)
+        res = []
+        seen = set()
+        for x in arr:
+            if freq[x] >= k and x not in seen:
+                res.append(str(x))
+                seen.add(x)
+                
+        inp_str = f"{n} {k}\n" + " ".join(map(str, arr)) + "\n"
+        out_str = " ".join(res) if res else "-1"
+        tests.append({"input": inp_str, "output": out_str})
+    return tests
+
+def generate_tests_boiso(count=100):
+    tests = [
+        {"input": "12\n", "output": "12"},
+        {"input": "25\n", "output": "24"}
+    ]
+    
+    def is_beautiful(num):
+        s_sum = sum(int(c) for c in str(num))
+        return s_sum > 0 and num % s_sum == 0
+
+    remaining = count - len(tests)
+    for i in range(remaining):
+        n = random.randint(1, 32000)
+        ans = n
+        while ans > 0:
+            if is_beautiful(ans):
+                break
+            ans -= 1
+        tests.append({"input": f"{n}\n", "output": str(ans)})
+    return tests
+
+def generate_tests_choncap(count=100):
+    tests = [{"input": "XYXY\n", "output": "4"}]
+    remaining = count - len(tests)
+    
+    def solve_choncap(s):
+        prefix_cnt = {0: 1}
+        curr = 0
+        ans = 0
+        for ch in s:
+            curr += 1 if ch == 'X' else -1
+            ans += prefix_cnt.get(curr, 0)
+            prefix_cnt[curr] = prefix_cnt.get(curr, 0) + 1
+        return ans
+
+    for i in range(remaining):
+        if i < 40: # 40% test: s <= 100
+            length = random.randint(1, 100)
+        elif i < 70: # 30% test: s <= 5000
+            length = random.randint(101, 5000)
+        else: # 30% test: s <= 1000000
+            length = random.randint(5001, 200000)
+            
+        s = "".join(random.choice(['X', 'Y']) for _ in range(length))
+        ans = solve_choncap(s)
+        tests.append({"input": s + "\n", "output": str(ans)})
+    return tests
+
+def generate_tests_dayso(count=100):
+    tests = [{"input": "5\n4 3 6 3 5\n", "output": "2"}]
+    remaining = count - len(tests)
+    for i in range(remaining):
+        if i < 20: # 20%: n <= 50
+            n = random.randint(4, 50)
+            max_val = 10**9
+        elif i < 40: # 20%: n <= 500
+            n = random.randint(51, 500)
+            max_val = 10**9
+        elif i < 60: # 20%: n <= 5000
+            n = random.randint(501, 5000)
+            max_val = 10**9
+        elif i < 80: # 20%: n <= 10^5, a[i] <= 10^5
+            n = random.randint(5001, 10000)
+            max_val = 100000
+        else: # 20% còn lại
+            n = random.randint(5001, 10000)
+            max_val = 10**9
+
+        a = [random.randint(1, max_val) for _ in range(n)]
+        
+        # Chuẩn bị giải đáp án mẫu cho test ngẫu nhiên
+        sums_freq = {}
+        for x in range(n):
+            for y in range(x + 1, n):
+                s = a[x] + a[y]
+                sums_freq[s] = sums_freq.get(s, 0) + 1
+
+        ans = 0
+        for p in range(n):
+            target = 3 * a[p]
+            valid = False
+            for j in range(n):
+                if j == p:
+                    continue
+                rem = target - a[j]
+                
+                # Loại trừ các cặp chứa index j hoặc p
+                invalid_cnt = 0
+                for other in [p, j]:
+                    s_check = a[j] + a[other]
+                    if s_check == rem:
+                        invalid_cnt += 1
+                
+                total_c = sums_freq.get(rem, 0)
+                if total_c - invalid_cnt > 0:
+                    valid = True
+                    break
+            if valid:
+                ans += 1
+
+        inp_str = f"{n}\n" + " ".join(map(str, a)) + "\n"
+        tests.append({"input": inp_str, "output": str(ans)})
+    return tests
+
+# ==================== DANH SÁCH BÀI TẬP (16 BÀI) ====================
 PROBLEMS = {
     "1": {
         "title": "Bài 1: Quy hoạch",
@@ -669,6 +795,95 @@ PROBLEMS = {
             <ul>
                 <li>50% số điểm có n, m &le; 10<sup>2</sup>.</li>
                 <li>50% số điểm còn lại không có ràng buộc gì thêm.</li>
+            </ul>
+        """
+    },
+    "13": {
+        "title": "Bài 13: Đếm số",
+        "input_file": "DEMSO.INP",
+        "output_file": "DEMSO.OUT",
+        "gen": generate_tests_demso,
+        "content_html": """
+            <p>Cho một dãy A có N số nguyên dương và một số nguyên dương K.</p>
+            <p><b>Yêu cầu:</b> Hãy xuất ra các phần tử có số lần xuất hiện trong dãy A từ K lần trở lên (mỗi số chỉ xuất 01 lần).</p>
+            <p><b>Dữ liệu:</b> Vào từ file văn bản <code>DEMSO.INP</code>:</p>
+            <ul>
+                <li>Dòng thứ nhất chứa 2 số nguyên dương N, K (1 &le; n, k &le; 5 . 10<sup>5</sup>).</li>
+                <li>Dòng tiếp theo chứa N số nguyên a[i] (1 &le; a[i] &le; 10<sup>6</sup>)</li>
+            </ul>
+            <p><b>Kết quả:</b> Ghi ra file văn bản <code>DEMSO.OUT</code> gồm một dòng là các số thỏa điều kiện trên (các số cách nhau khoảng trắng), trường hợp không có số nào thỏa thì xuất số -1.</p>
+            <table class="example-table">
+                <tr><th>DEMSO.INP</th><th>DEMSO.OUT</th></tr>
+                <tr><td>12 3<br>2 3 3 3 5 8 8 8 7 6 7 6</td><td>3 8</td></tr>
+            </table>
+            <p><b>Ràng buộc:</b> 100% số điểm theo yêu cầu đề bài.</p>
+        """
+    },
+    "14": {
+        "title": "Bài 14: Tìm bội số",
+        "input_file": "BOISO.INP",
+        "output_file": "BOISO.OUT",
+        "gen": generate_tests_boiso,
+        "content_html": """
+            <p>Cho một số nguyên dương n. Số n được gọi là “số đẹp trai” nếu n có là bội của tổng tất cả các chữ số của nó.</p>
+            <p><b>Yêu cầu:</b> Nếu n là “số đẹp trai” thì in ra số n, nếu không thì in ra số nguyên dương m nhỏ hơn và gần n nhất thỏa mãn m là “số đẹp trai”.</p>
+            <p><b>Dữ liệu:</b> Vào từ file văn bản <code>BOISO.INP</code> chứa số nguyên dương n (1 &le; n &le; 32000).</p>
+            <p><b>Kết quả:</b> Ghi ra file văn bản <code>BOISO.OUT</code> gồm một số nguyên là kết quả của bài toán.</p>
+            <table class="example-table">
+                <tr><th>BOISO.INP</th><th>BOISO.OUT</th></tr>
+                <tr><td>12</td><td>12</td></tr>
+                <tr><td>25</td><td>24</td></tr>
+            </table>
+            <p><b>Ràng buộc:</b> 100% số điểm theo yêu cầu đề bài.</p>
+        """
+    },
+    "15": {
+        "title": "Bài 15: Chọn cặp",
+        "input_file": "CHONCAP.INP",
+        "output_file": "CHONCAP.OUT",
+        "gen": generate_tests_choncap,
+        "content_html": """
+            <p>Cho một xâu kí tự s chỉ gồm 2 kí tự X và Y.</p>
+            <p><b>Yêu cầu:</b> Đếm số cách chọn cặp chỉ số (i, j) mà xâu con liên tiếp từ kí tự thứ i đến kí tự thứ j của xâu S có số lượng kí tự X bằng số lượng kí tự Y.</p>
+            <p><b>Dữ liệu:</b> Vào từ file văn bản <code>BOISO.INP</code> chứa xâu s (1 &le; s &le; 10<sup>6</sup>).</p>
+            <p><b>Kết quả:</b> Ghi ra file văn bản <code>BOISO.OUT</code> gồm một số nguyên là kết quả của bài toán.</p>
+            <table class="example-table">
+                <tr><th>BOISO.INP</th><th>BOISO.OUT</th></tr>
+                <tr><td>XYXY</td><td>4</td></tr>
+            </table>
+            <p><b>Ràng buộc:</b></p>
+            <ul>
+                <li>40% số điểm của bài tương ứng với các test có s &le; 100.</li>
+                <li>30% số điểm của bài tương ứng với các test có s &le; 5000.</li>
+                <li>30% số điểm còn lại không có ràng buộc gì thêm.</li>
+            </ul>
+        """
+    },
+    "16": {
+        "title": "Bài 16: Dãy số",
+        "input_file": "DAYSO.INP",
+        "output_file": "DAYSO.OUT",
+        "gen": generate_tests_dayso,
+        "content_html": """
+            <p>Cho một dãy A có N số nguyên dương. Số a[p] (1 &le; p &le; n) được gọi là một số trung bình cộng trong dãy nếu tồn tại 3 chỉ số i, j, k (1 &le; i, j, k &le; n) đôi một khác nhau, sao cho a[p] = (a[i] + a[j] + a[k]) &divide; 3.</p>
+            <p><b>Yêu cầu:</b> Hãy tìm số lượng các số trung bình cộng trong dãy.</p>
+            <p><b>Dữ liệu:</b> Vào từ file văn bản <code>DAYSO.INP</code>:</p>
+            <ul>
+                <li>Dòng thứ nhất chứa 2 số nguyên dương N (1 &le; n &le; 10<sup>5</sup>).</li>
+                <li>Dòng tiếp theo chứa N số nguyên a[i] (1 &le; a[i] &le; 10<sup>9</sup>)</li>
+            </ul>
+            <p><b>Kết quả:</b> Ghi ra file văn bản <code>DAYSO.OUT</code> gồm một số nguyên là kết quả bài toán.</p>
+            <table class="example-table">
+                <tr><th>DEMSO.INP</th><th>DEMSO.OUT</th></tr>
+                <tr><td>5<br>4 3 6 3 5</td><td>2</td></tr>
+            </table>
+            <p><b>Ràng buộc:</b></p>
+            <ul>
+                <li>20% số điểm của bài tương ứng với các test có n &le; 50.</li>
+                <li>20% số điểm của bài tương ứng với các test có n &le; 500.</li>
+                <li>20% số điểm của bài tương ứng với các test có n &le; 5000.</li>
+                <li>20% số điểm của bài tương ứng với các test có n &le; 10<sup>5</sup>, a[i] &le; 10<sup>5</sup>.</li>
+                <li>20% số điểm còn lại không có ràng buộc gì thêm.</li>
             </ul>
         """
     }
